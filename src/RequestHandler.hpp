@@ -17,7 +17,6 @@ private:
 
     uint32_t LoadContent(HttpResponse& resp, std::string url);
     uint32_t HandleError(HttpResponse& resp, uint32_t errorCode);
-    uint32_t LoadFileUnsafe(HttpResponse& resp, std::string url);
 public:
     RequestHandler(HttpRequest& req, ServerConfig& serverConfig);
     HttpResponse GenerateResponse();

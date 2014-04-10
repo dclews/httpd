@@ -3,7 +3,7 @@
 
 using namespace std;
 
-ServerConfig::ServerConfig() : KvpDB("ServerConfig", '\t') {}
+ServerConfig::ServerConfig() : KvpDB("ServerConfig", '=') {}
 
 bool ServerConfig::ValidatePath(const std::string& filePath)
 {

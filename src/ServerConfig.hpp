@@ -15,10 +15,10 @@ public:
     bool Init();
 
     bool ValidatePath(const std::string& filePath);
-    MimeDB& Mimes();
-    HttpResponseDB& StatusDB();
     //@Override.
     bool Reload();
+    MimeDB& Mimes();
+    HttpResponseDB& StatusDB();
 };
 
 #endif

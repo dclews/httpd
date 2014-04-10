@@ -1,6 +1,7 @@
 #include "RequestHandler.hpp"
 #include <clews/utility/FileUtil.hpp>
 #include <clews/http/HttpCommon.hpp>
+#include <clews/http/HttpResourceTemplate.hpp>
 #include "ServerUtil.hpp"
 
 using namespace std;
@@ -28,11 +29,20 @@ HttpResponse RequestHandler::GenerateResponse()
 }
 uint32_t RequestHandler::HandleError(HttpResponse& resp, uint32_t errorCode)
 {
-    uint32_t status = LoadFileUnsafe(resp, statusPagePath(mServerConfig, errorCode));
-    if(status != HTTP_OK)
+    string url = statusPagePath(mServerConfig, errorCode);
+    HttpResource res(url, mServerConfig.Mimes());
+    uint32_t status = res.Load() ? HTTP_OK : HTTP_NOT_FOUND;
+    if(status)
     {
-        LoadFileUnsafe(resp, statusPagePath(mServerConfig, HTTP_SERVER_ERROR));
+        resp.SetContent(res);
     }
+    else
+    {
+        url = statusPagePath(mServerConfig, HTTP_SERVER_ERROR);
+        HttpResource srvErrorRes(url, mServerConfig.Mimes());
+        resp.SetContent(srvErrorRes);
+    }
+
     return status;
 }
 uint32_t RequestHandler::LoadContent(HttpResponse& resp, string url)
@@ -63,7 +73,9 @@ uint32_t RequestHandler::LoadContent(HttpResponse& resp, string url)
     if(status != HTTP_FORBIDDEN)
     {
         StandardOut() << "Retrieving file: " + url << endl;
-        status = LoadFileUnsafe(resp, url);
+        HttpResource res(url, mServerConfig.Mimes());
+        status = res.Load() ? HTTP_OK : HTTP_NOT_FOUND;
+        resp.SetContent(res);
     }
     else
     {
@@ -72,21 +84,5 @@ uint32_t RequestHandler::LoadContent(HttpResponse& resp, string url)
 
     ClearPrintPrefix();
 
-    return status;
-}
-uint32_t RequestHandler::LoadFileUnsafe(HttpResponse& resp, string url)
-{
-    uint32_t status = 0;
-
-    SetPrintPrefix(__func__, FUNC_PRINT);
-    StandardOut() << "Loading file: " + url << endl;
-
-    HttpResource res(url, mServerConfig.Mimes());
-    status = res.Load() ? HTTP_OK : HTTP_NOT_FOUND;
-
-    MimeType mimeType = res.Mime();
-    resp.SetContentType(mimeType.RawType());
-    resp.SetContent(res.Content());
-    ClearPrintPrefix();
     return status;
 }

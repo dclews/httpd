@@ -32,7 +32,7 @@ void mapSignalHandlers()
 int main(int argc, char** argv)
 {
     ServerConfig serverConfig;
-    serverConfig.Load("res/Server.config");
+    serverConfig.Load("res/DB/Server.config");
     serverConfig.Init();
 
     HTTPServer os(serverConfig);
