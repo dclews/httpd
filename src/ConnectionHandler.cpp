@@ -36,7 +36,7 @@ bool ConnectionHandler::AcceptConnection()
     }
     else
     {
-        ErrorOut() << "Faield to accept connection." << endl;
+        ErrorOut() << "Failed to accept connection." << endl;
     }
     ClearPrintPrefix();
     return success;
