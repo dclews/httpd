@@ -7,8 +7,9 @@
 using namespace std;
 
 HTTPServer::HTTPServer(ServerConfig& serverConfig) : CoreObject("HTTPServer"), mServerConfig(serverConfig),
-    mSocketStream(serverConfig.GetInt("ServerPort"), serverConfig.GetInt("ServerBufferSize"))
+    mSocket(serverConfig.GetInt("ServerPort"), serverConfig.GetInt("ServerBufferSize"))
 {
+    mSocket.DebugOut().Enable(true);
 }
 bool HTTPServer::ReloadConfig()
 {
@@ -19,70 +20,46 @@ bool HTTPServer::ReloadConfig()
 
 ExitCodes HTTPServer::Start()
 {
-    run = true;
+    mRun = true;
     //ss.DebugOut().Enable(true);
-    if(!mSocketStream.Create())
+
+    if(!mSocket.Create())
     {
         ErrorOut() << "Failed to create server. Giving up." << endl;
         return CREATE_FAILED;
     }
-
-    if(mSocketStream.Listen() != 0)
+    if(mSocket.Listen() != 0)
     {
         ErrorOut() << "Failed to listen to socket. Giving up." << endl;
         return LISTEN_FAILED;
     }
-    int conPid = fork();
-    if(conPid < 0)
-    {
-        ErrorOut() << "Failed to start connection handler." << endl;
-    }
-    else if(conPid == 0)
-    {
-        StandardOut() << "Starting connection handler." << endl;
-        SpawnConnections();
-        StandardOut() << "DONE CON." << endl;
-        exit(0);
-    }
 
-    int status = 0;
-    int pidCom = fork();
-    if(pidCom < 0)
-    {
-        ErrorOut() << "[PARENT] Failed to start command handler" << endl;
-    }
-    else if(pidCom==0)
-    {
-        //SetPrintPrefix("[CHILD-COM] ");
-        StandardOut() << "Starting command handler." << endl;
-        CommandHandler();
-        StandardOut() << "DONE COM." << endl;
-        exit(0);
-    }
-    waitpid(pidCom, &status, 0);
-    StandardOut() << "[PARENT] Exit called. Cleaning up." << endl;
+    mConnectionThread = thread(&HTTPServer::SpawnConnections, this);
+    mCommandThread = thread(&HTTPServer::CommandHandler, this);
 
-    if(!mSocketStream.Destroy())
-    {
-        cerr << "Socket did not close cleanly!" << endl;
-        return DESTROY_DIRTY;
-    }
+    mCommandThread.join();
+    mConnectionThread.join();
+
     return SUCCESS;
 }
 void HTTPServer::SpawnConnections()
 {
     SetPrintPrefix(__func__, FUNC_PRINT);
-    while(run)
+    StandardOut() << endl;
+    while(mRun)
     {
-        ConnectionHandler connection(mSocketStream, mServerConfig);
+        ConnectionHandler connection(mSocket, mServerConfig);
         connection.AcceptConnection();
     }
+    StandardOut() << "Done.";
+    ClearPrintPrefix();
 }
 void HTTPServer::CommandHandler()
 {
-    StandardOut() << "CommandHandler()" << endl;
+    SetPrintPrefix(__func__, FUNC_PRINT);
+    StandardOut() << endl;
     string command;
-    do
+    while(command != "exit" && mRun)
     {
         getline(cin, command);
         vector<string> commandParts = split(command, ' ');
@@ -120,9 +97,12 @@ void HTTPServer::CommandHandler()
             }
         }
     }
-    while (command != "exit" && run == true);
+    StandardOut() << "Done." << endl;
+    Stop();
+    ClearPrintPrefix();
 }
 void HTTPServer::Stop()
 {
-    run = false;
+    StandardOut() << "Stopping server." << endl;
+    mRun = false;
 }

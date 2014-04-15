@@ -2,7 +2,7 @@
 #define CONNECTION_HANDLER_HPP
 
 #include <clews/core/CoreObject.hpp>
-#include <clews/sock/SocketStream.hpp>
+#include <clews/sock/Socket.hpp>
 #include "ServerConfig.hpp"
 
 
@@ -10,9 +10,9 @@ class ConnectionHandler : public CoreObject
 {
 private:
     ServerConfig& mServerConfig;
-    SocketStream& mSocketStream;
+    Socket& mSocketStream;
 public:
-    ConnectionHandler(SocketStream& ss, ServerConfig& config);
+    ConnectionHandler(Socket& ss, ServerConfig& config);
     bool AcceptConnection();
 };
 

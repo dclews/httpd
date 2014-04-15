@@ -7,15 +7,19 @@
 
 using namespace std;
 
-ConnectionHandler::ConnectionHandler(SocketStream& ss, ServerConfig& config) : CoreObject("ConnectionHandler"), mServerConfig(config), mSocketStream(ss) {}
+ConnectionHandler::ConnectionHandler(Socket& ss, ServerConfig& config) : CoreObject("ConnectionHandler"), mServerConfig(config), mSocketStream(ss) {}
 
 bool ConnectionHandler::AcceptConnection()
 {
     SetPrintPrefix(__func__, FUNC_PRINT);
     bool success = false;
-    if(mSocketStream.Accept() >= 0)
+
+    SocketConnection* con = mSocketStream.Accept();
+    if(con != NULL)
     {
-        string requestStr = mSocketStream.Read();
+        con->DebugOut().Enable(true);
+
+        string requestStr = con->Read();
         HttpRequest request(requestStr);
         bool keepAlive = request["Connection"] != "Close";
 
@@ -24,10 +28,11 @@ bool ConnectionHandler::AcceptConnection()
 
         StandardOut() << "Sending Response:" << endl;
         resp.PrintHeader();
-        mSocketStream << resp.FullResponse();
-        mSocketStream.Close();
+        *con << resp.FullResponse();
+        con->Close();
 
         success = true;
+        delete con;
     }
     else
     {

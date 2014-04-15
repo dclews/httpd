@@ -2,7 +2,7 @@
 #define HTTP_SERVER_HPP
 
 #include <clews/core/CoreObject.hpp>
-#include <clews/sock/SocketStream.hpp>
+#include <clews/sock/Socket.hpp>
 #include <clews/utility/StringUtil.hpp>
 #include <clews/utility/FileUtil.hpp>
 #include <stdio.h>
@@ -16,6 +16,7 @@
 #include <clews/http/HttpResponse.hpp>
 #include <clews/http/HttpRequest.hpp>
 #include <clews/http/HttpResource.hpp>
+#include <thread>
 #include "ServerConfig.hpp"
 #include "RequestHandler.hpp"
 
@@ -35,9 +36,12 @@ enum ExitCodes
 class HTTPServer : CoreObject
 {
 private:
-    bool run;
-    SocketStream mSocketStream;
+    bool mRun;
+    Socket mSocket;
     ServerConfig& mServerConfig;
+
+    std::thread mConnectionThread;
+    std::thread mCommandThread;
 
     void CommandHandler();
     void SpawnConnections();

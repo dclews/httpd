@@ -11,6 +11,7 @@ void signalHandler(int signo)
         case SIGINT:cout << "SIGINT Recieved." << endl; server->Stop(); break;
         case SIGSTOP:cout << "SIGSTOP" << endl; break;
         case SIGKILL: cout << "SIGKILL" << endl; break;
+        case SIGPIPE: cout << "SIGPIPE Recieved." << endl; break;
     }
 }
 void mapSignalHandlers()
@@ -27,6 +28,11 @@ void mapSignalHandlers()
     {
         cerr << "Failed to map SIGSTOP handler." << endl;
     }
+    if(signal(SIGPIPE, signalHandler) == SIG_ERR)
+    {
+        cerr << "Failed to map SIGPIPE handler." << endl;
+    }
+
 }
 
 int main(int argc, char** argv)
