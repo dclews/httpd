@@ -9,11 +9,11 @@
 class ConnectionHandler : public CoreObject
 {
 private:
-    ServerConfig& mServerConfig;
-    Socket& mSocketStream;
+	ServerConfig& mServerConfig;
+	Socket& mSocketStream;
 public:
-    ConnectionHandler(Socket& ss, ServerConfig& config);
-    bool AcceptConnection();
+	ConnectionHandler(Socket& ss, ServerConfig& config);
+	bool AcceptConnection();
 };
 
 #endif

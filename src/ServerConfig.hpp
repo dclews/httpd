@@ -8,17 +8,17 @@
 class ServerConfig : public KvpDB
 {
 private:
-    MimeDB mMimeDB;
-    HttpResponseDB mStatusDB;
+	MimeDB mMimeDB;
+	HttpResponseDB mStatusDB;
 public:
-    ServerConfig();
-    bool Init();
+	ServerConfig();
+	bool Init();
 
-    bool ValidatePath(const std::string& filePath);
-    //@Override.
-    bool Reload();
-    MimeDB& Mimes();
-    HttpResponseDB& StatusDB();
+	bool ValidatePath(const std::string& filePath);
+	//@Override.
+	bool Reload();
+	MimeDB& Mimes();
+	HttpResponseDB& StatusDB();
 };
 
 #endif

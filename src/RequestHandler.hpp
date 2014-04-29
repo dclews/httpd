@@ -12,14 +12,14 @@
 class RequestHandler : CoreObject
 {
 private:
-    ServerConfig& mServerConfig;
-    HttpRequest& mRequest;
+	ServerConfig& mServerConfig;
+	HttpRequest& mRequest;
 
-    uint32_t LoadContent(HttpResponse& resp, std::string url);
-    uint32_t HandleError(HttpResponse& resp, uint32_t errorCode);
+	uint32_t LoadContent(HttpResponse& resp, std::string url);
+	uint32_t HandleError(HttpResponse& resp, uint32_t errorCode);
 public:
-    RequestHandler(HttpRequest& req, ServerConfig& serverConfig);
-    HttpResponse GenerateResponse();
+	RequestHandler(HttpRequest& req, ServerConfig& serverConfig);
+	HttpResponse GenerateResponse();
 };
 
 #endif

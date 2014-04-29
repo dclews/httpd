@@ -26,31 +26,31 @@
 
 enum ExitCodes
 {
-    SUCCESS         = 0,
-    CREATE_FAILED   = 1,
-    LISTEN_FAILED   = 2,
-    DESTROY_DIRTY   = 3,
-    COMMAND_FAILED  = 4
+	SUCCESS         = 0,
+	CREATE_FAILED   = 1,
+	LISTEN_FAILED   = 2,
+	DESTROY_DIRTY   = 3,
+	COMMAND_FAILED  = 4
 };
 
 class HTTPServer : CoreObject
 {
 private:
-    bool mRun;
-    Socket mSocket;
-    ServerConfig& mServerConfig;
+	bool mRun;
+	Socket mSocket;
+	ServerConfig& mServerConfig;
 
-    std::thread mConnectionThread;
-    std::thread mCommandThread;
+	std::thread mConnectionThread;
+	std::thread mCommandThread;
 
-    void CommandHandler();
-    void SpawnConnections();
+	void CommandHandler();
+	void SpawnConnections();
 public:
-    HTTPServer(ServerConfig& serverConfig);
-    ExitCodes Start();
-    void Stop();
-    bool LoadConfig();
-    bool ReloadConfig();
+	HTTPServer(ServerConfig& serverConfig);
+	ExitCodes Start();
+	void Stop();
+	bool LoadConfig();
+	bool ReloadConfig();
 };
 
 #endif
